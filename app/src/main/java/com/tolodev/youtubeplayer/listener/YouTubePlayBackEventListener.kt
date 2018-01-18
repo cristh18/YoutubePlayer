@@ -18,11 +18,12 @@ class YouTubePlayBackEventListener(private val context: Context) : YouTubePlayer
 
     override fun onPlaying() {
         Toast.makeText(context, "Playing video", Toast.LENGTH_SHORT).show()
+        YoutubeControlManager.getInstance().videoPlaying()
     }
 
     override fun onStopped() {
         Toast.makeText(context, "Video stopped", Toast.LENGTH_SHORT).show()
-        YoutubeControlManager.getInstance().videoStoppedSubject(true)
+        YoutubeControlManager.getInstance().videoStopped()
     }
 
     override fun onPaused() {

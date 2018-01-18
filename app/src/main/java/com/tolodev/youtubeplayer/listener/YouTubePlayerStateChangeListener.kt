@@ -8,8 +8,6 @@ import com.tolodev.youtubeplayer.manager.YoutubeControlManager
 
 class YouTubePlayerStateChangeListener(private var context: Context) : YouTubePlayer.PlayerStateChangeListener {
 
-    lateinit var videoViewedListener: VideoViewedListener
-
     override fun onLoading() {
         // Called when the player is loading a video
         // At this point, it's not ready to accept commands affecting playback such as play() or pause()
@@ -26,21 +24,15 @@ class YouTubePlayerStateChangeListener(private var context: Context) : YouTubePl
 
     override fun onVideoStarted() {
         Toast.makeText(context, "Video started", Toast.LENGTH_SHORT).show()
-        YoutubeControlManager.getInstance().videoEndedSubject(false)
+        YoutubeControlManager.getInstance().videoStarted()
     }
 
     override fun onVideoEnded() {
         Toast.makeText(context, "Video ended", Toast.LENGTH_SHORT).show()
-        YoutubeControlManager.getInstance().videoEndedSubject(true)
-
-//        videoViewedListener.videoViewed()
+        YoutubeControlManager.getInstance().videoEnded()
     }
 
     override fun onError(errorReason: YouTubePlayer.ErrorReason) {
         // Called when an error occurs.
-    }
-
-    interface VideoViewedListener {
-        fun videoViewed()
     }
 }

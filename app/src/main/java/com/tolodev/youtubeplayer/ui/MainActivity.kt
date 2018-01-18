@@ -14,7 +14,7 @@ import com.tolodev.youtubeplayer.viewmodel.MainViewModel
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.disposables.Disposable
 
-class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener, YouTubePlayerStateChangeListener.VideoViewedListener {
+class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener {
 
     private lateinit var activityMainBinding: ActivityMainBinding
     private var player: YouTubePlayer? = null
@@ -34,6 +34,12 @@ class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener,
     private fun init() {
         subscriptions = CompositeDisposable()
         mainViewModel = MainViewModel()
+        initListeners()
+    }
+
+    private fun initListeners() {
+        playerStateChangeListener = YouTubePlayerStateChangeListener(this)
+        playBackEventListener = YouTubePlayBackEventListener(this)
     }
 
     private fun setupView() {
@@ -46,13 +52,12 @@ class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener,
     }
 
     private fun videoViewedDisposable(): Disposable {
+        return mainViewModel.videoViewedObservable().filter({ t -> t }).subscribe(this::showLevelUp, { it.printStackTrace() })
+    }
 
-        return mainViewModel.videoViewedObservable().subscribe({ t ->
-            run {
-                Toast.makeText(this, "Notify change", Toast.LENGTH_LONG).show()
-                mainViewModel.videoViewed.set(t)
-            }
-        }, { it.printStackTrace() })
+    private fun showLevelUp(t: Boolean) {
+        Toast.makeText(this, "Notify change", Toast.LENGTH_LONG).show()
+        mainViewModel.videoViewed.set(t)
     }
 
     fun getVIdeoIdFromURL(videoUrl: String): Int {
@@ -64,21 +69,11 @@ class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener,
     override fun onInitializationSuccess(p0: YouTubePlayer.Provider?, youTubePlayer: YouTubePlayer?, wasRestored: Boolean) {
         player = youTubePlayer
         player?.setPlayerStyle(YouTubePlayer.PlayerStyle.MINIMAL)
-
-        playerStateChangeListener = YouTubePlayerStateChangeListener(this)
-        playerStateChangeListener.videoViewedListener = this
-
-        playBackEventListener = YouTubePlayBackEventListener(this)
-
-
-
-
         player?.setPlayerStateChangeListener(playerStateChangeListener)
         player?.setPlaybackEventListener(playBackEventListener)
 
         if (!wasRestored) {
-//            player?.cueVideo("jLuMq-ZAxqY")
-            player?.cueVideo("668nUCeBHyY")
+            player?.cueVideo(getString(R.string.youtube_video_id))
         }
     }
 
@@ -89,10 +84,5 @@ class MainActivity : YouTubeBaseActivity(), YouTubePlayer.OnInitializedListener,
     override fun onResume() {
         super.onResume()
         handleSubscriptions()
-    }
-
-    override fun videoViewed() {
-        Toast.makeText(this, "Notify change", Toast.LENGTH_LONG).show()
-        mainViewModel.videoViewed.set(true)
     }
 }

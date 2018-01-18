@@ -30,11 +30,19 @@ class YoutubeControlManager {
         return videoEndedSubject.hide().subscribeOn(Schedulers.io()).observeOn(AndroidSchedulers.mainThread())
     }
 
-    fun videoStoppedSubject(isStopped: Boolean) {
-        videoStoppedSubject.onNext(isStopped)
+    fun videoPlaying() {
+        videoStoppedSubject.onNext(false)
     }
 
-    fun videoEndedSubject(isStopped: Boolean) {
-        videoEndedSubject.onNext(isStopped)
+    fun videoStopped() {
+        videoStoppedSubject.onNext(true)
+    }
+
+    fun videoStarted() {
+        videoEndedSubject.onNext(false)
+    }
+
+    fun videoEnded() {
+        videoEndedSubject.onNext(true)
     }
 }
